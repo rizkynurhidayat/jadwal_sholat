@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jadwal_sholat/controller/controllerKu.dart';
+import 'package:jadwal_sholat/pages/jadwal_coba.dart';
 
 import 'pages/home_page.dart';
 
@@ -14,7 +15,9 @@ class MyApp extends GetView<ControllerKu> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      home: HomePage(),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(useMaterial3: true),
+      home: const CobaPage(),
     );
   }
 }
