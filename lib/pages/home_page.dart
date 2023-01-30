@@ -5,6 +5,8 @@ import 'package:jadwal_sholat/pages/jadwal_sholat.dart';
 import '../controller/controllerKu.dart';
 
 class HomePage extends GetView<ControllerKu> {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final kota = Get.put(Kota());

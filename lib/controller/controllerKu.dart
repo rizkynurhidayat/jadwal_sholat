@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-class ControllerKu extends GetxController {
+class ControllerKu extends GetxController with StateMixin<Response> {
   var data = [].obs;
 }
 
