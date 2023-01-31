@@ -26,7 +26,7 @@ class JadwalSholatPage extends GetView<ControllerKu> {
       ),
       body: SafeArea(
           child: FutureBuilder<Response>(
-        future: con.getjadwal(id, tahun, bulan, tanggal),
+        future: con.getjadwal(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final data = snapshot.data!.body!;
