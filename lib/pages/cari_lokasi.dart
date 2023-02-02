@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jadwal_sholat/pages/jadwal_coba.dart';
-import 'package:jadwal_sholat/pages/jadwal_sholat.dart';
 
 import '../controller/controllerKu.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class CariLokasiPage extends StatelessWidget {
+  const CariLokasiPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +13,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text("Cari Lokasi"),
+          title: const Text("Cari Lokasi"),
         ),
         body: SafeArea(
             child: Column(
@@ -40,7 +38,7 @@ class HomePage extends StatelessWidget {
 
                             controller.namaKota.value = data[index]['lokasi'];
                             controller.idKota.value = data[index]['id'];
-                            Get.to(SorePage());
+                            Get.back();
                           },
                           title: Text(data[index]['lokasi']),
                           subtitle: Text(data[index]['id']),
@@ -48,7 +46,7 @@ class HomePage extends StatelessWidget {
                       ),
                     );
                   } else {
-                    return Center(
+                    return const Center(
                       child: Text("Loading"),
                     );
                   }

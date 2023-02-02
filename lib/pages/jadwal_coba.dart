@@ -5,15 +5,13 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:jadwal_sholat/controller/controllerKu.dart';
-import 'package:jadwal_sholat/model/sholat_model.dart';
-import 'package:jadwal_sholat/pages/home_page.dart';
-import 'package:lottie/lottie.dart';
-import 'package:slide_countdown/slide_countdown.dart';
+
+import 'package:jadwal_sholat/pages/cari_lokasi.dart';
 
 import '../model/contain.dart';
 
-class SorePage extends StatelessWidget {
-  SorePage({
+class HomePage extends StatelessWidget {
+  const HomePage({
     super.key,
   });
 
@@ -42,7 +40,7 @@ class SorePage extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () {
-                Get.to(HomePage());
+                Get.to(const CariLokasiPage());
               },
               icon: const Icon(
                 Icons.add,
@@ -54,7 +52,7 @@ class SorePage extends StatelessWidget {
         child: Stack(
           children: [
             bgKu(),
-            animasiKu(),
+            const animasiKu(),
             Align(
               alignment: Alignment.bottomCenter,
               child: Image.asset(
@@ -87,8 +85,8 @@ class SorePage extends StatelessWidget {
                             fontWeight: FontWeight.bold),
                       );
                     }),
-                    Spacer(),
-                    Text("sekian menit"),
+                    const Spacer(),
+                    const Text("sekian menit"),
                     SizedBox(
                       height: Get.height / 5,
                     ),
@@ -164,19 +162,7 @@ class SorePage extends StatelessWidget {
                                   (i[6].hour * 60) + i[6].minute,
                                   (i[7].hour * 60) + i[7].minute,
                                 ];
-                                final sek = (20 * 60);
-                                final b = [
-                                  (sek >= j[0] && sek < j[1]),
-                                  (sek >= j[1] && sek < j[2]),
-                                  (sek >= j[2] && sek < j[3]),
-                                  (sek >= j[3] && sek < j[4]),
-                                  (sek >= j[4] && sek < j[5]),
-                                  (sek >= j[5] && sek < j[6]),
-                                  (sek >= j[6] && sek < j[7]),
-                                  (sek >= j[7] || sek < j[0]),
-                                ];
-                                print(j);
-                                print(sek);
+
                                 return ListView.builder(
                                   itemCount: u.length,
                                   itemBuilder: (context, index) {
