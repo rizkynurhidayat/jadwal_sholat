@@ -22,7 +22,7 @@ class MyApp extends GetView<ControllerKu> {
       theme: ThemeData(
         useMaterial3: true,
       ),
-      home: SorePage(kota: 'Kab. Tegal'),
+      home: SorePage(),
     );
   }
 }

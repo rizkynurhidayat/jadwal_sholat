@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'dart:math';
 
 class ControllerKu extends GetxController {
+  TextEditingController namakota = TextEditingController(text: "tegal");
+  ScrollController scroll = ScrollController();
   var jam = 0.obs;
   var menit = 0.obs;
   var detik = 0.obs;
@@ -13,6 +15,8 @@ class ControllerKu extends GetxController {
 
   var isStop = false.obs;
   var isAdzan = false.obs;
+  var idKota = "1426".obs;
+  var namaKota = "Kab. Tegal".obs;
 
   List<String> listmoon = [
     'moon1.png',
@@ -27,6 +31,7 @@ class ControllerKu extends GetxController {
     'bintang.json',
     'bintang_jatuh.json',
   ];
+
   Map<String, List<Color>> gradient = const {
     'moon1': [Color(0xFF3B4371), Color(0xFFF3904F)],
     'moon2': [Color(0xFF000428), Color(0xFF004E92)],
@@ -35,47 +40,46 @@ class ControllerKu extends GetxController {
     'sun3': [Color(0xFF56CCF2), Color(0xFF2F80ED)],
     'sun4': [Color(0xFFFF8F49), Color(0xFFD76D77)],
   };
-  late dynamic data;
-
-  void incremet() {
-    detik.value = detik.value + 1;
-  }
 
   String moon() {
-    if (detik.value == 2) {
+    if (menit.value >= 1020) {
       return listmoon[0];
-    } else if (detik.value == 4) {
+    } else if (menit.value >= 1260) {
       return listmoon[1];
-    } else if (detik.value == 6) {
+    } else if (menit.value >= 240) {
       return listmoon[2];
-    } else if (detik.value == 8) {
+    } else if (menit.value >= 360) {
       return listmoon[3];
-    } else if (detik.value == 10) {
+    } else if (menit.value >= 600) {
       return listmoon[4];
+    } else if (menit.value >= 960) {
+      return listmoon[5];
     }
-
     return listmoon[5];
   }
 
   List<Color> color() {
-    if (detik.value == 2) {
+    if (menit.value >= 1020) {
       return gradient['moon1']!;
-    } else if (detik.value == 4) {
+    } else if (menit.value >= 1260) {
       return gradient['moon2']!;
-    } else if (detik.value == 6) {
+    } else if (menit.value >= 240) {
       return gradient['sun1']!;
-    } else if (detik.value == 8) {
+    } else if (menit.value >= 360) {
       return gradient['sun2']!;
-    } else if (detik.value == 10) {
+    } else if (menit.value >= 600) {
       return gradient['sun3']!;
+    } else if (menit.value >= 960) {
+      return gradient['sun4']!;
     }
     return gradient['sun4']!;
+    // return gradient['sun4']!;
   }
 
   String lottie() {
-    if (detik.value == 2) {
+    if (menit.value >= 1020) {
       return listlottie[1];
-    } else if (detik.value == 4) {
+    } else if (menit.value >= 1260) {
       return listlottie[2];
     }
     return listlottie[0];
@@ -88,20 +92,19 @@ class ControllerKu extends GetxController {
     isStop.value = true;
   }
 
-  void adzan(String waktu) {
-    const s = 4;
-    final p = DateFormat.Hm().parse(waktu);
-    if (p.hour == s) {
-      isAdzan.value == true;
-    }
-  }
-
-  Color adzn(DateTime waktu) {
-    int s = 12;
-    if (waktu.hour == s) {
-      return Colors.white.withOpacity(0.3);
-    }
-    return Colors.transparent;
+  List<bool> cek(List<int> j) {
+    final sek = menit.value;
+    final b = [
+      (sek >= j[0] && sek < j[1]),
+      (sek >= j[1] && sek < j[2]),
+      (sek >= j[2] && sek < j[3]),
+      (sek >= j[3] && sek < j[4]),
+      (sek >= j[4] && sek < j[5]),
+      (sek >= j[5] && sek < j[6]),
+      (sek >= j[6] && sek < j[7]),
+      (sek >= j[7] || sek < j[0]),
+    ];
+    return b;
   }
 
   void waktu() {
@@ -114,8 +117,8 @@ class ControllerKu extends GetxController {
 
       final now = DateTime.now();
       pukul.value = DateFormat.Hms().format(now);
-      // jam.value = now.hour;
-      // menit.value = now.minute;
+
+      menit.value = (now.hour * 60) + now.minute;
       // detik.value = now.second;
     });
   }
@@ -124,12 +127,13 @@ class ControllerKu extends GetxController {
 class Kota extends GetConnect {
   Future<Response> getAllKota() {
     return get(
-      "https://api.myquran.com/v1/sholat/kota/cari/tegal",
+      "https://api.myquran.com/v1/sholat/kota/semua",
     );
   }
 
   Future<Response> getjadwal() {
-    const id = "1426";
+    final c = Get.put(ControllerKu());
+    final id = c.idKota.value;
     final date = DateTime.now();
     final tahun = date.year;
     final bulan = date.month;
