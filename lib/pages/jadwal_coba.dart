@@ -20,9 +20,11 @@ class HomePage extends StatelessWidget {
     final con = Get.put(Kota());
 
     final c = Get.put(ControllerKu());
-    c.waktu();
+
     final now = DateTime.now();
     final tanggal = DateFormat("EEEE, d MMMM y", "id_ID").format(now);
+
+    c.waktu();
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -85,10 +87,19 @@ class HomePage extends StatelessWidget {
                             fontWeight: FontWeight.bold),
                       );
                     }),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Obx(() => Text(
+                          c.remain.value,
+                          style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontStyle: FontStyle.italic),
+                        )),
                     const Spacer(),
-                    const Text("sekian menit"),
                     SizedBox(
-                      height: Get.height / 5,
+                      height: Get.height / 3,
                     ),
                   ],
                 ),
@@ -123,62 +134,61 @@ class HomePage extends StatelessWidget {
                                 topLeft: Radius.circular(30),
                                 topRight: Radius.circular(30)),
                             color: Colors.grey.shade200.withOpacity(0.2)),
-                        child: FutureBuilder<Response<dynamic>>(
-                          future: con.getjadwal(),
-                          builder: (context, snapshot) {
-                            try {
-                              if (snapshot.hasData) {
-                                final data = snapshot.data!.body!;
-                                final jadwalsholat = data['data']['jadwal']
-                                    as Map<String, dynamic>;
+                        child: Obx(
+                          () => FutureBuilder<Response<dynamic>>(
+                            future: con.getjadwal(id: c.idKota.value),
+                            builder: (context, snapshot) {
+                              try {
+                                if (snapshot.hasData) {
+                                  final data = snapshot.data!.body!;
+                                  final jadwalsholat = data['data']['jadwal']
+                                      as Map<String, dynamic>;
 
-                                final u = [
-                                  'imsak',
-                                  'subuh',
-                                  'terbit',
-                                  'dhuha',
-                                  'dzuhur',
-                                  'ashar',
-                                  'maghrib',
-                                  'isya'
-                                ];
-                                final i = [
-                                  DateFormat.Hm().parse(jadwalsholat[u[0]]),
-                                  DateFormat.Hm().parse(jadwalsholat[u[1]]),
-                                  DateFormat.Hm().parse(jadwalsholat[u[2]]),
-                                  DateFormat.Hm().parse(jadwalsholat[u[3]]),
-                                  DateFormat.Hm().parse(jadwalsholat[u[4]]),
-                                  DateFormat.Hm().parse(jadwalsholat[u[5]]),
-                                  DateFormat.Hm().parse(jadwalsholat[u[6]]),
-                                  DateFormat.Hm().parse(jadwalsholat[u[7]]),
-                                ];
-                                final j = [
-                                  (i[0].hour * 60) + i[0].minute,
-                                  (i[1].hour * 60) + i[1].minute,
-                                  (i[2].hour * 60) + i[2].minute,
-                                  (i[3].hour * 60) + i[3].minute,
-                                  (i[4].hour * 60) + i[4].minute,
-                                  (i[5].hour * 60) + i[5].minute,
-                                  (i[6].hour * 60) + i[6].minute,
-                                  (i[7].hour * 60) + i[7].minute,
-                                ];
+                                  // c.jadwalsholat.addAll(jadwalsholat);
+                                  final u = [
+                                    'imsak',
+                                    'subuh',
+                                    'terbit',
+                                    'dhuha',
+                                    'dzuhur',
+                                    'ashar',
+                                    'maghrib',
+                                    'isya'
+                                  ];
+                                  final i = <DateTime>[];
+                                  for (var element in u) {
+                                    i.add(DateFormat.Hm()
+                                        .parse(jadwalsholat[element]));
+                                  }
 
-                                return ListView.builder(
-                                  itemCount: u.length,
-                                  itemBuilder: (context, index) {
-                                    return SholatKu(
-                                      jam: DateFormat.Hm().format(i[index]),
-                                      waktu: u[index],
-                                      adzan: c.cek(j)[index],
-                                    );
-                                  },
-                                );
+                                  if (c.jamsholat.isNotEmpty) {
+                                    c.jamsholat.clear();
+                                  }
+                                  for (var element in i) {
+                                    c.jamsholat.add(
+                                        (element.hour * 60) + element.minute);
+                                  }
+                                  print("jam sholat di bawah");
+                                  print(c.jamsholat);
+                                  // c.updateJadwalSholat();
+
+                                  return ListView.builder(
+                                    itemCount: u.length,
+                                    itemBuilder: (context, index) {
+                                      return SholatKu(
+                                        jam: DateFormat.Hm().format(i[index]),
+                                        waktu: u[index],
+                                        adzan: c.cek()[index],
+                                      );
+                                    },
+                                  );
+                                }
+                              } catch (err) {
+                                print(err);
                               }
-                            } catch (err) {
-                              print(err);
-                            }
-                            return Container();
-                          },
+                              return Container();
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -192,3 +202,62 @@ class HomePage extends StatelessWidget {
     );
   }
 }
+
+
+
+
+//  Obx(
+//                       () => FutureBuilder<Response<dynamic>>(
+//                         future: con.getjadwal(id: c.idKota.value),
+//                         builder: (context, snapshot) {
+//                           try {
+//                             if (snapshot.hasData) {
+//                               final data = snapshot.data!.body!;
+//                               final jadwalsholat = data['data']['jadwal']
+//                                   as Map<String, dynamic>;
+//                               final u = [
+//                                 'imsak',
+//                                 'subuh',
+//                                 'terbit',
+//                                 'dhuha',
+//                                 'dzuhur',
+//                                 'ashar',
+//                                 'maghrib',
+//                                 'isya'
+//                               ];
+//                               final i = <DateTime>[];
+//                               for (var element in u) {
+//                                 i.add(DateFormat.Hm()
+//                                     .parse(jadwalsholat[element]));
+//                               }
+
+//                               if (c.jamsholat.isNotEmpty) {
+//                                 c.jamsholat.clear();
+//                               }
+//                               for (var element in i) {
+//                                 c.jamsholat
+//                                     .add((element.hour * 60) + element.minute);
+//                               }
+//                               print("jam sholat di atas");
+//                               print(c.jamsholat);
+//                               return Obx(
+//                                 () => Text(c.remain.value,
+//                                     style: GoogleFonts.poppins(
+//                                         fontSize: 14,
+//                                         color: Colors.white,
+//                                         fontStyle: FontStyle.italic)),
+//                               );
+//                             }
+//                           } catch (err) {
+//                             print(err);
+//                           }
+//                           return SizedBox(
+//                             child: Text(c.remain.value,
+//                                 style: GoogleFonts.poppins(
+//                                   fontSize: 18,
+//                                   color: Colors.white,
+//                                 )),
+//                           );
+//                         },
+//                       ),
+//                     ),

@@ -3,12 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'dart:math';
 
 class ControllerKu extends GetxController {
   TextEditingController namakota = TextEditingController(text: "tegal");
   ScrollController scroll = ScrollController();
-  var jam = 0.obs;
+
   var menit = 0.obs;
   var detik = 0.obs;
   var pukul = "".obs;
@@ -17,6 +16,22 @@ class ControllerKu extends GetxController {
   var isAdzan = false.obs;
   var idKota = "1426".obs;
   var namaKota = "Kab. Tegal".obs;
+  var remain = "00 menit".obs;
+  var dataLokasi = <String>[].obs;
+  Map<String, dynamic> jadwalsholat = {};
+  final u = [
+    'imsak',
+    'subuh',
+    'terbit',
+    'dhuha',
+    'dzuhur',
+    'ashar',
+    'maghrib',
+    'isya'
+  ];
+  // final i = <DateTime>[];
+
+  List<int> jamsholat = [];
 
   List<String> listmoon = [
     'moon1.png',
@@ -30,6 +45,7 @@ class ControllerKu extends GetxController {
     'awan.json',
     'bintang.json',
     'bintang_jatuh.json',
+    'cloud.json',
   ];
 
   Map<String, List<Color>> gradient = const {
@@ -42,34 +58,34 @@ class ControllerKu extends GetxController {
   };
 
   String moon() {
-    if (menit.value >= 1020) {
+    if (menit.value >= 1020 && menit.value < 1260) {
       return listmoon[0];
-    } else if (menit.value >= 1260) {
+    } else if (menit.value >= 1260 || menit.value <= 240) {
       return listmoon[1];
-    } else if (menit.value >= 240) {
+    } else if (menit.value >= 240 && menit.value < 360) {
       return listmoon[2];
-    } else if (menit.value >= 360) {
+    } else if (menit.value >= 360 && menit.value < 600) {
       return listmoon[3];
-    } else if (menit.value >= 600) {
+    } else if (menit.value >= 600 && menit.value < 960) {
       return listmoon[4];
-    } else if (menit.value >= 960) {
+    } else if (menit.value >= 960 && menit.value < 1020) {
       return listmoon[5];
     }
     return listmoon[5];
   }
 
   List<Color> color() {
-    if (menit.value >= 1020) {
+    if (menit.value >= 1020 && menit.value < 1260) {
       return gradient['moon1']!;
-    } else if (menit.value >= 1260) {
+    } else if (menit.value >= 1260 || menit.value <= 240) {
       return gradient['moon2']!;
-    } else if (menit.value >= 240) {
+    } else if (menit.value >= 240 && menit.value < 360) {
       return gradient['sun1']!;
-    } else if (menit.value >= 360) {
+    } else if (menit.value >= 360 && menit.value < 600) {
       return gradient['sun2']!;
-    } else if (menit.value >= 600) {
+    } else if (menit.value >= 600 && menit.value < 960) {
       return gradient['sun3']!;
-    } else if (menit.value >= 960) {
+    } else if (menit.value >= 960 && menit.value < 1020) {
       return gradient['sun4']!;
     }
     return gradient['sun4']!;
@@ -77,12 +93,12 @@ class ControllerKu extends GetxController {
   }
 
   String lottie() {
-    if (menit.value >= 1020) {
+    if (menit.value >= 1020 && menit.value < 1260) {
       return listlottie[1];
-    } else if (menit.value >= 1260) {
+    } else if (menit.value >= 1260 || menit.value <= 240) {
       return listlottie[2];
     }
-    return listlottie[0];
+    return listlottie[3];
   }
 
   @override
@@ -92,33 +108,74 @@ class ControllerKu extends GetxController {
     isStop.value = true;
   }
 
-  List<bool> cek(List<int> j) {
+  List<bool> cek() {
     final sek = menit.value;
     final b = [
-      (sek >= j[0] && sek < j[1]),
-      (sek >= j[1] && sek < j[2]),
-      (sek >= j[2] && sek < j[3]),
-      (sek >= j[3] && sek < j[4]),
-      (sek >= j[4] && sek < j[5]),
-      (sek >= j[5] && sek < j[6]),
-      (sek >= j[6] && sek < j[7]),
-      (sek >= j[7] || sek < j[0]),
+      (sek >= jamsholat[0] && sek < jamsholat[1]),
+      (sek >= jamsholat[1] && sek < jamsholat[2]),
+      (sek >= jamsholat[2] && sek < jamsholat[3]),
+      (sek >= jamsholat[3] && sek < jamsholat[4]),
+      (sek >= jamsholat[4] && sek < jamsholat[5]),
+      (sek >= jamsholat[5] && sek < jamsholat[6]),
+      (sek >= jamsholat[6] && sek < jamsholat[7]),
+      (sek >= jamsholat[7] || sek < jamsholat[0]),
     ];
     return b;
   }
+
+  void remaining() {
+    final sek = menit.value;
+    if (sek <= jamsholat[0]) {
+      remain.value =
+          "${jamsholat[0] - sek} menit lagi menuju ${toBeginningOfSentenceCase(u[0])}";
+    } else if (sek <= jamsholat[1] && sek > jamsholat[0]) {
+      remain.value =
+          "${jamsholat[1] - sek} menit lagi menuju ${toBeginningOfSentenceCase(u[1])}";
+    } else if (sek <= jamsholat[2] && sek > jamsholat[1]) {
+      remain.value =
+          "${jamsholat[2] - sek} menit lagi menuju ${toBeginningOfSentenceCase(u[2])}";
+    } else if (sek <= jamsholat[3] && sek > jamsholat[2]) {
+      remain.value =
+          "${jamsholat[3] - sek} menit lagi menuju ${toBeginningOfSentenceCase(u[3])}";
+    } else if (sek <= jamsholat[4] && sek > jamsholat[3]) {
+      remain.value =
+          "${jamsholat[4] - sek} menit lagi menuju ${toBeginningOfSentenceCase(u[4])}";
+    } else if (sek <= jamsholat[5] && sek > jamsholat[4]) {
+      remain.value =
+          "${jamsholat[5] - sek} menit lagi menuju ${toBeginningOfSentenceCase(u[5])}";
+    } else if (sek <= jamsholat[6] && sek > jamsholat[5]) {
+      remain.value =
+          "${jamsholat[6] - sek} menit lagi menuju ${toBeginningOfSentenceCase(u[6])}";
+    } else if (sek <= jamsholat[7] && sek > jamsholat[6]) {
+      remain.value =
+          "${jamsholat[7] - sek} menit lagi menuju ${toBeginningOfSentenceCase(u[7])}";
+    } else if (sek > jamsholat[7]) {
+      remain.value =
+          "${(1440 - sek) + jamsholat[0]} menit lagi menuju ${toBeginningOfSentenceCase(u[0])}";
+    }
+  }
+
+  // void updateJadwalSholat() {
+  //   for (var element in u) {
+  //     i.add(DateFormat.Hm().parse(jadwalsholat[element]));
+  //   }
+  //   for (var element in i) {
+  //     jamsholat.add((element.hour * 60) + element.minute);
+  //   }
+  // }
 
   void waktu() {
     const oneSec = Duration(seconds: 1);
 
     Timer.periodic(oneSec, (Timer t) {
-      if (isStop.isTrue) {
-        t.cancel();
-      }
-
+      // if (isStop.isTrue) {
+      //   t.cancel();
+      // }
       final now = DateTime.now();
       pukul.value = DateFormat.Hms().format(now);
 
       menit.value = (now.hour * 60) + now.minute;
+      remaining();
       // detik.value = now.second;
     });
   }
@@ -131,9 +188,7 @@ class Kota extends GetConnect {
     );
   }
 
-  Future<Response> getjadwal() {
-    final c = Get.put(ControllerKu());
-    final id = c.idKota.value;
+  Future<Response> getjadwal({required String id}) {
     final date = DateTime.now();
     final tahun = date.year;
     final bulan = date.month;
